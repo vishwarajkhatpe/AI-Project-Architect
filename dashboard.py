@@ -6,18 +6,15 @@ from app.api_handler import get_ai_response
 from app.utils import parse_ai_response
 from core.creator import create_in_memory_zip
 
-# 1. Page Config (Professional Icon)
+# 1. Page Config
 st.set_page_config(page_title="AI Architect", page_icon="🏗️", layout="wide")
 
-# 2. MODERN & INTERACTIVE CSS
+# 2. CSS STYLING
 st.markdown("""
     <style>
-    /* --- ANIMATIONS --- */
     @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     
-    /* --- HERO HEADER (New Style) --- */
     .hero-container {
-        /* Deep Tech Gradient: Indigo to Violet */
         background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
         padding: 2.5rem;
         border-radius: 16px;
@@ -27,65 +24,30 @@ st.markdown("""
         box-shadow: 0 10px 30px rgba(67, 56, 202, 0.3);
         animation: slideIn 0.8s ease-out;
     }
-    .hero-title {
-        font-size: 3.2rem;
-        font-weight: 800;
-        margin: 0;
-        color: #ffffff;
-        letter-spacing: -1px;
-    }
-    .hero-subtitle {
-        font-size: 1.2rem;
-        color: #e0e7ff; /* Light indigo text */
-        margin-top: 10px;
-        font-weight: 400;
-        max-width: 700px;
-        margin-left: auto;
-        margin-right: auto;
-    }
+    .hero-title { font-size: 3.2rem; font-weight: 800; margin: 0; color: #ffffff; letter-spacing: -1px; }
+    .hero-subtitle { font-size: 1.2rem; color: #e0e7ff; margin-top: 10px; font-weight: 400; }
 
-    /* --- FEATURE CARDS (Interactive) --- */
     .feature-card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 12px;
-        border: 1px solid #e5e7eb;
-        text-align: center;
-        transition: all 0.3s ease;
-        height: 100%;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        background: white; padding: 1.5rem; border-radius: 12px; border: 1px solid #e5e7eb;
+        text-align: center; transition: all 0.3s ease; height: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
-    .feature-card:hover {
-        transform: translateY(-5px);
-        border-color: #6366f1;
-        box-shadow: 0 15px 30px rgba(99, 102, 241, 0.15);
-    }
+    .feature-card:hover { transform: translateY(-5px); border-color: #6366f1; box-shadow: 0 15px 30px rgba(99, 102, 241, 0.15); }
     .feature-icon { font-size: 2.5rem; margin-bottom: 15px; }
     .feature-title { font-weight: 700; font-size: 1.1rem; color: #111827; }
     .feature-desc { color: #6b7280; font-size: 0.9rem; margin-top: 5px; line-height: 1.5; }
 
-    /* --- BUTTONS --- */
     button[kind="primary"] {
         background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
-        border: none !important;
-        color: white !important;
-        font-weight: 600 !important;
-        padding: 0.6rem 1.4rem;
-        border-radius: 8px;
-        transition: transform 0.2s ease !important;
+        border: none !important; color: white !important; font-weight: 600 !important;
+        padding: 0.6rem 1.4rem; border-radius: 8px; transition: transform 0.2s ease !important;
     }
-    button[kind="primary"]:hover {
-        transform: scale(1.02);
-        box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
-    }
+    button[kind="primary"]:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4); }
     
-    /* --- FOOTER --- */
     .footer {
         position: fixed; left: 0; bottom: 0; width: 100%;
         background: #ffffff; color: #9ca3af;
         text-align: center; padding: 12px;
-        font-size: 0.8rem; border-top: 1px solid #f3f4f6;
-        z-index: 100;
+        font-size: 0.8rem; border-top: 1px solid #f3f4f6; z-index: 100;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -110,26 +72,36 @@ def main():
     if "tree_key" not in st.session_state: st.session_state.tree_key = 0
     if "checked_files" not in st.session_state: st.session_state.checked_files = []
     if "nav_index" not in st.session_state: st.session_state.nav_index = 0
+    # FIX: Add a menu key to force redraws
+    if "menu_key" not in st.session_state: st.session_state.menu_key = 0
 
     with st.sidebar:
-        # NEW LOGO (Folder/Blueprint Icon)
         st.image("https://cdn-icons-png.flaticon.com/512/3767/3767084.png", width=55)
         st.markdown("### AI Architect")
         
-        # NAVIGATION
+        # NAVIGATION FIX
+        # We use a dynamic key 'menu_key'. When this changes, the menu rebuilds completely.
+        menu_options = ["Home", "Builder", "Settings", "Help / FAQ"]
+        
         selected = option_menu(
             menu_title=None,
-            options=["Home", "Builder", "Settings", "Help / FAQ"], 
+            options=menu_options, 
             icons=['house', 'hammer', 'sliders', 'question-circle'], 
             default_index=st.session_state.nav_index,
+            # THE SECRET SAUCE: Changing this key forces the component to re-render with the new index
+            key=f"menu_{st.session_state.menu_key}", 
             styles={
                 "nav-link": {"border-radius": "8px", "margin": "5px 0", "font-size": "0.9rem"},
                 "nav-link-selected": {"background-color": "#4f46e5", "font-weight": "600"},
             }
         )
         
+        # SYNC: If user clicks menu manually, update our index variable
+        if menu_options.index(selected) != st.session_state.nav_index:
+            st.session_state.nav_index = menu_options.index(selected)
+        
         st.divider()
-        st.caption("v5.0 | Stable Build")
+        st.caption("v5.1 | Stable Release")
 
     # --- 1. HOME PAGE ---
     if selected == "Home":
@@ -145,8 +117,10 @@ def main():
         
         c1, c2, c3 = st.columns([1, 2, 1])
         with c2:
+            # BUTTON FIX: Updates Index AND increments Menu Key to force sidebar update
             if st.button("🚀 Launch Project Builder", type="primary", use_container_width=True):
-                st.session_state.nav_index = 1
+                st.session_state.nav_index = 1  # Set to Builder
+                st.session_state.menu_key += 1  # Force Sidebar Redraw
                 st.rerun()
         
         st.write("")
