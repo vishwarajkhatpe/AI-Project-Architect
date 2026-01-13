@@ -6,28 +6,17 @@ from app.utils import parse_ai_response
 from core.creator import create_in_memory_zip
 
 # 1. Page Config
-st.set_page_config(
-    page_title="AI Architect Pro V2",
-    page_icon="🚀",
-    layout="wide"
-)
+st.set_page_config(page_title="AI Architect Pro V2", page_icon="🚀", layout="wide")
 
 # 2. Styling
 st.markdown("""
     <style>
-    .footer {
-        position: fixed; left: 0; bottom: 0; width: 100%;
-        background-color: #f8f9fa; color: #6c757d;
-        text-align: center; padding: 8px;
-        font-size: 0.8rem; border-top: 1px solid #dee2e6;
-    }
-    /* Make the code block look cleaner */
+    .footer { position: fixed; left: 0; bottom: 0; width: 100%; background-color: #f8f9fa; color: #6c757d; text-align: center; padding: 8px; font-size: 0.8rem; border-top: 1px solid #dee2e6; }
     .stCodeBlock { border: 1px solid #ececec; border-radius: 8px; }
     </style>
 """, unsafe_allow_html=True)
 
 def convert_to_tree(file_data):
-    """Converts the Dictionary keys into a tree structure for the UI."""
     nodes = []
     for path in file_data.keys():
         parts = path.split('/')
@@ -52,99 +41,101 @@ def main():
             styles={"nav-link-selected": {"background-color": "#007BFF"}}
         )
         st.divider()
-        st.caption("Version 2.0: Boilerplate Engine")
+        st.caption("Version 2.2: Stable")
 
-    # --- GENERATOR PAGE ---
+    # --- PAGE: GENERATOR ---
     if selected == "Generator":
         st.title("V2.0: Project Boilerplate Generator")
-        
-        # Initialize session state
-        if "file_data" not in st.session_state:
-            st.session_state.file_data = {}
+        if "file_data" not in st.session_state: st.session_state.file_data = {}
 
-        col1, col2 = st.columns([1, 1.5], gap="large") # Added GAP for better spacing
+        col1, col2 = st.columns([1, 1.5], gap="large")
 
         with col1:
             st.subheader("📝 Project Idea")
-            st.write("Describe your app, and I'll write the starter code.")
-            user_input = st.text_area(
-                "Description:",
-                placeholder="Example: A Python script that uses Selenium to log into a website and download invoices.",
-                height=200,
-                label_visibility="collapsed"
-            )
+            user_input = st.text_area("Description:", placeholder="E.g. A React app with Tailwind...", height=200)
             
-            st.write("") # Spacer
-            if st.button("✨ Generate Full Boilerplate", type="primary", use_container_width=True):
+            st.write("")
+            if st.button("✨ Generate Boilerplate", type="primary", use_container_width=True):
                 if user_input:
-                    with st.spinner("🤖 AI is writing your starter code..."):
+                    with st.spinner("🤖 AI is working..."):
+                        # Default to the one model we KNOW works if nothing is set
+                        if "selected_model" not in st.session_state:
+                            st.session_state.selected_model = "Qwen/Qwen2.5-Coder-32B-Instruct"
+                            
                         raw_response = get_ai_response(user_input)
                         parsed_dict = parse_ai_response(raw_response)
-                        
                         if parsed_dict:
                             st.session_state.file_data = parsed_dict
-                            st.toast("✅ Code Generated Successfully!", icon="🚀")
+                            st.toast("✅ Success!", icon="🚀")
                         else:
-                            st.error("AI failed to generate a valid JSON structure. Try again.")
+                            st.error("AI Error. Try checking your Settings > Model.")
 
         with col2:
-            st.subheader("📂 Code Preview")
-            
-            # Container for the results adds a nice border visual
+            st.subheader("📂 Preview")
             with st.container(border=True):
                 if st.session_state.file_data:
                     tree_nodes = convert_to_tree(st.session_state.file_data)
-                    all_node_values = [n["value"] for n in tree_nodes]
-
-                    # Inner columns for Tree vs Code
+                    all_vals = [n["value"] for n in tree_nodes]
+                    
                     c1, c2 = st.columns([1, 2])
-                    
                     with c1:
-                        st.caption("File Tree")
-                        selected_tree = tree_select(
-                            tree_nodes, 
-                            no_cascade=True, 
-                            expanded=all_node_values
-                        )
-                    
+                        selected_tree = tree_select(tree_nodes, no_cascade=True, expanded=all_vals)
                     with c2:
-                        st.caption("Content Preview")
                         if selected_tree['checked']:
-                            target_file = selected_tree['checked'][0]
-                            if target_file in st.session_state.file_data:
-                                lang = "python" if target_file.endswith(".py") else "text"
-                                st.code(st.session_state.file_data[target_file], language=lang, line_numbers=True)
-                            else:
-                                st.info("Select a file, not a folder.")
-                        else:
-                            st.info("👈 Select a file to view code.")
-
+                            f = selected_tree['checked'][0]
+                            if f in st.session_state.file_data:
+                                st.code(st.session_state.file_data[f], language="python" if f.endswith(".py") else "text")
                 else:
-                    st.info("Your generated project structure and code will appear here.")
-                    # Placeholder image to make empty state look better
-                    st.markdown("Waiting for input...", help="Enter a prompt on the left")
+                    st.info("Waiting for input...")
 
-        # --- DOWNLOAD SECTION (CENTERED) ---
         if st.session_state.file_data:
             st.divider()
-            
-            # THE CENTERING TRICK: 3 Columns
-            # We put the button in the middle column (b2)
             b1, b2, b3 = st.columns([1, 2, 1])
-            
             with b2:
-                zip_bytes = create_in_memory_zip(st.session_state.file_data)
-                st.download_button(
-                    label="📥 Download Complete Project ZIP",
-                    data=zip_bytes,
-                    file_name="architect_project.zip",
-                    mime="application/zip",
-                    type="primary",
-                    use_container_width=True
-                )
+                st.download_button("📥 Download ZIP", create_in_memory_zip(st.session_state.file_data), "project.zip", "application/zip", type="primary", use_container_width=True)
 
-    # --- FOOTER ---
-    st.markdown('<div class="footer">Created by <b>YourName</b> | Project Architect V2.0</div>', unsafe_allow_html=True)
+    # --- PAGE: SETTINGS (FIXED) ---
+    elif selected == "Settings":
+        st.title("⚙️ Configuration")
+        st.write("Customize how the AI Architect behaves.")
+
+        # 1. API Token Section
+        with st.container(border=True):
+            st.subheader("🔑 API Access")
+            st.info("Your local .env token is used by default.")
+            user_token = st.text_input("Override Token (Optional)", type="password", placeholder="hf_...")
+
+        # 2. Model Selection Section
+        with st.container(border=True):
+            st.subheader("🧠 AI Model Engine")
+            
+            # We default to the list, but allow a custom text input
+            model_mode = st.radio("Select Source:", ["Official Presets", "Custom Model ID"], horizontal=True)
+            
+            if model_mode == "Official Presets":
+                # We only show the one we KNOW works + a backup
+                model_choice = st.selectbox(
+                    "Choose Model:",
+                    ["Qwen/Qwen2.5-Coder-32B-Instruct", "google/gemma-2-9b-it"],
+                    index=0
+                )
+            else:
+                model_choice = st.text_input("Enter HuggingFace Model ID:", "Qwen/Qwen2.5-Coder-32B-Instruct")
+
+        # 3. APPLY BUTTON (New!)
+        st.write("")
+        if st.button("💾 Apply Settings", type="primary"):
+            # Save Token
+            if user_token:
+                st.session_state.user_hf_token = user_token
+            
+            # Save Model
+            st.session_state.selected_model = model_choice
+            
+            st.toast("✅ Settings Saved!", icon="💾")
+            st.success(f"Model set to: **{model_choice}**")
+
+    st.markdown('<div class="footer">Created by <b>YourName</b></div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
