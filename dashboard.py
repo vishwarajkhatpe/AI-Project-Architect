@@ -129,11 +129,10 @@ def main():
         )
         
         st.divider()
-        st.caption("v5.1 | Enterprise Edition")
+        st.caption("v5.0 | Stable Build")
 
     # --- 1. HOME PAGE ---
     if selected == "Home":
-        # New Tech-Style Hero
         st.markdown("""
             <div class="hero-container">
                 <div class="hero-title">AI Architect</div>
@@ -144,7 +143,6 @@ def main():
             </div>
         """, unsafe_allow_html=True)
         
-        # Centered Launch Button
         c1, c2, c3 = st.columns([1, 2, 1])
         with c2:
             if st.button("🚀 Launch Project Builder", type="primary", use_container_width=True):
@@ -154,7 +152,6 @@ def main():
         st.write("")
         st.write("")
         
-        # Interactive Feature Cards
         col1, col2, col3 = st.columns(3)
         with col1:
             st.markdown("""
@@ -192,7 +189,6 @@ def main():
         with col1:
             st.subheader("1. Configuration")
             
-            # Professional Badges
             mode = st.session_state.complexity
             if mode == "Structure Only":
                 st.info("**Mode:** Structure Only (Fastest)")
@@ -237,13 +233,10 @@ def main():
                     tree_nodes = convert_to_tree(st.session_state.file_data)
                     all_vals = [n["value"] for n in tree_nodes]
                     
-                    current_checked = st.session_state.checked_files
-                    all_files = list(st.session_state.file_data.keys())
-                    
                     c_btn1, c_btn2 = st.columns(2)
                     with c_btn1:
                         if st.button("Select All", use_container_width=True):
-                            st.session_state.checked_files = all_files
+                            st.session_state.checked_files = list(st.session_state.file_data.keys())
                             st.session_state.tree_key += 1
                             st.rerun()
                     with c_btn2:
@@ -344,7 +337,7 @@ def main():
             st.session_state.complexity = complexity_choice
             st.toast("Settings Saved!", icon="💾")
 
-    # --- 4. FAQ PAGE (NEW & EXPANDED) ---
+    # --- 4. FAQ PAGE ---
     elif selected == "Help / FAQ":
         st.title("❓ Help & Support")
         
