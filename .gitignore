@@ -1,9 +1,22 @@
 # Python safety
+# Python junk
 __pycache__/
 *.pyc
 
-# Environment safety (NEVER upload these)
-.env
+# Environments
 venv/
 .venv/
+env/
+
+# Editor settings
+.vscode/
+.idea/
+
+# Mac junk
 .DS_Store
+
+# Local Secrets (Never upload this!)
+.env
+
+# Temporary files
+*.zip
