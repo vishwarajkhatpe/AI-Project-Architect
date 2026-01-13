@@ -15,7 +15,6 @@ st.markdown("""
     .footer { position: fixed; left: 0; bottom: 0; width: 100%; background-color: #f8f9fa; color: #6c757d; text-align: center; padding: 8px; font-size: 0.8rem; border-top: 1px solid #dee2e6; z-index: 100; }
     
     /* SCROLLABLE CODE BLOCK FIX */
-    /* This forces the code box to be max 500px tall with a scrollbar */
     .element-container:has(.stCodeBlock) {
         max-height: 500px;
         overflow-y: auto;
@@ -50,7 +49,7 @@ def main():
             styles={"nav-link-selected": {"background-color": "#007BFF"}}
         )
         st.divider()
-        st.caption("Version 2.3: Scrollable UI")
+        st.caption("Version 2.4: Optimized")
 
     # --- PAGE: GENERATOR ---
     if selected == "Generator":
@@ -66,7 +65,8 @@ def main():
             st.write("")
             if st.button("✨ Generate Boilerplate", type="primary", use_container_width=True):
                 if user_input:
-                    with st.spinner("🤖 AI is working..."):
+                    with st.spinner("🤖 AI is writing your starter code..."):
+                        # Default to Qwen if not set
                         if "selected_model" not in st.session_state:
                             st.session_state.selected_model = "Qwen/Qwen2.5-Coder-32B-Instruct"
                             
@@ -76,7 +76,7 @@ def main():
                             st.session_state.file_data = parsed_dict
                             st.toast("✅ Success!", icon="🚀")
                         else:
-                            st.error("AI Error. Check Settings.")
+                            st.error("AI Error. Try checking Settings > Model.")
 
         with col2:
             st.subheader("📂 Preview")
@@ -87,15 +87,14 @@ def main():
                     
                     c1, c2 = st.columns([1, 2])
                     with c1:
-                        # Fixed Tree: Takes up 1/3 of space
+                        # Tree View
                         selected_tree = tree_select(tree_nodes, no_cascade=True, expanded=all_vals)
                     with c2:
-                        # Fixed Code: Takes up 2/3 of space
+                        # Code View
                         if selected_tree['checked']:
                             f = selected_tree['checked'][0]
                             if f in st.session_state.file_data:
                                 lang = "python" if f.endswith(".py") else "text"
-                                # The CSS above will automatically make this scrollable!
                                 st.code(st.session_state.file_data[f], language=lang, line_numbers=True)
                 else:
                     st.info("Waiting for input...")
@@ -112,15 +111,25 @@ def main():
         
         with st.container(border=True):
             st.subheader("🔑 API Access")
-            st.info("Your local .env token is used by default.")
-            user_token = st.text_input("Override Token (Optional)", type="password", placeholder="hf_...")
+            # --- CHANGED TEXT HERE ---
+            st.info("Add your custom API key (Overrides local defaults).")
+            user_token = st.text_input("Hugging Face Token", type="password", placeholder="hf_...")
 
         with st.container(border=True):
             st.subheader("🧠 AI Model Engine")
             model_mode = st.radio("Select Source:", ["Official Presets", "Custom Model ID"], horizontal=True)
             
             if model_mode == "Official Presets":
-                model_choice = st.selectbox("Choose Model:", ["Qwen/Qwen2.5-Coder-32B-Instruct", "google/gemma-2-9b-it"], index=0)
+                # --- ADDED GEMMA (FASTER MODEL) ---
+                model_choice = st.selectbox(
+                    "Choose Model:", 
+                    [
+                        "Qwen/Qwen2.5-Coder-32B-Instruct", 
+                        "google/gemma-2-9b-it" 
+                    ], 
+                    index=0,
+                    help="Qwen 32B is smarter but slower. Gemma 9B is faster."
+                )
             else:
                 model_choice = st.text_input("Enter HuggingFace Model ID:", "Qwen/Qwen2.5-Coder-32B-Instruct")
 
@@ -131,6 +140,7 @@ def main():
             st.toast("✅ Settings Saved!", icon="💾")
             st.success(f"Model set to: **{model_choice}**")
 
+    # --- UPDATED FOOTER WITH YOUR NAME ---
     st.markdown('<div class="footer">Created by <b>VishwarajKhatpe</b></div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
