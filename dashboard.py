@@ -6,83 +6,85 @@ from app.api_handler import get_ai_response
 from app.utils import parse_ai_response
 from core.creator import create_in_memory_zip
 
-# 1. Page Config
-st.set_page_config(page_title="AI Architect", page_icon="🌈", layout="wide")
+# 1. Page Config (Professional Icon)
+st.set_page_config(page_title="AI Architect", page_icon="🏗️", layout="wide")
 
-# 2. VIBRANT CSS STYLING
+# 2. MODERN & INTERACTIVE CSS
 st.markdown("""
     <style>
     /* --- ANIMATIONS --- */
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     
-    /* --- HERO HEADER --- */
+    /* --- HERO HEADER (New Style) --- */
     .hero-container {
-        background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
-        padding: 3rem;
-        border-radius: 20px;
-        color: #2d3436;
+        /* Deep Tech Gradient: Indigo to Violet */
+        background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
+        padding: 2.5rem;
+        border-radius: 16px;
+        color: white;
         text-align: center;
         margin-bottom: 2rem;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        animation: fadeIn 1s ease-in;
+        box-shadow: 0 10px 30px rgba(67, 56, 202, 0.3);
+        animation: slideIn 0.8s ease-out;
     }
     .hero-title {
-        font-size: 3.5rem;
+        font-size: 3.2rem;
         font-weight: 800;
         margin: 0;
-        color: #2d3436;
-        text-shadow: 2px 2px 0px white;
+        color: #ffffff;
+        letter-spacing: -1px;
     }
     .hero-subtitle {
-        font-size: 1.3rem;
-        color: #4b6584;
-        margin-top: 15px;
-        font-weight: 500;
+        font-size: 1.2rem;
+        color: #e0e7ff; /* Light indigo text */
+        margin-top: 10px;
+        font-weight: 400;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
-    /* --- FEATURE CARDS --- */
+    /* --- FEATURE CARDS (Interactive) --- */
     .feature-card {
         background: white;
-        padding: 20px;
-        border-radius: 15px;
-        border: 2px solid #f1f2f6;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
         text-align: center;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition: all 0.3s ease;
         height: 100%;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
     .feature-card:hover {
-        transform: translateY(-10px);
-        border-color: #84fab0;
-        box-shadow: 0 10px 20px rgba(132, 250, 176, 0.3);
+        transform: translateY(-5px);
+        border-color: #6366f1;
+        box-shadow: 0 15px 30px rgba(99, 102, 241, 0.15);
     }
-    .feature-icon { font-size: 3rem; margin-bottom: 10px; }
-    .feature-title { font-weight: 700; font-size: 1.2rem; color: #2d3436; }
-    .feature-desc { color: #636e72; font-size: 0.95rem; }
+    .feature-icon { font-size: 2.5rem; margin-bottom: 15px; }
+    .feature-title { font-weight: 700; font-size: 1.1rem; color: #111827; }
+    .feature-desc { color: #6b7280; font-size: 0.9rem; margin-top: 5px; line-height: 1.5; }
 
     /* --- BUTTONS --- */
     button[kind="primary"] {
-        background: linear-gradient(to right, #667eea 0%, #764ba2 100%) !important;
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
         border: none !important;
         color: white !important;
-        font-weight: 700 !important;
-        padding: 0.7rem 1.5rem;
-        border-radius: 10px;
-        transition: all 0.2s !important;
+        font-weight: 600 !important;
+        padding: 0.6rem 1.4rem;
+        border-radius: 8px;
+        transition: transform 0.2s ease !important;
     }
     button[kind="primary"]:hover {
-        transform: scale(1.05);
-        box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+        transform: scale(1.02);
+        box-shadow: 0 5px 15px rgba(79, 70, 229, 0.4);
     }
-    
-    /* --- STATUS BADGES --- */
-    .stAlert { border-radius: 10px; }
     
     /* --- FOOTER --- */
     .footer {
         position: fixed; left: 0; bottom: 0; width: 100%;
-        background: white; color: #b2bec3;
-        text-align: center; padding: 10px;
-        font-size: 0.8rem; border-top: 1px solid #dfe6e9;
+        background: #ffffff; color: #9ca3af;
+        text-align: center; padding: 12px;
+        font-size: 0.8rem; border-top: 1px solid #f3f4f6;
         z-index: 100;
     }
     </style>
@@ -110,143 +112,142 @@ def main():
     if "nav_index" not in st.session_state: st.session_state.nav_index = 0
 
     with st.sidebar:
-        st.image("https://cdn-icons-png.flaticon.com/512/8695/8695995.png", width=60)
-        st.markdown("### 🏗️ AI Architect")
+        # NEW LOGO (Folder/Blueprint Icon)
+        st.image("https://cdn-icons-png.flaticon.com/512/3767/3767084.png", width=55)
+        st.markdown("### AI Architect")
         
-        # NAVIGATION with FAQ added
+        # NAVIGATION
         selected = option_menu(
             menu_title=None,
             options=["Home", "Builder", "Settings", "Help / FAQ"], 
             icons=['house', 'hammer', 'sliders', 'question-circle'], 
             default_index=st.session_state.nav_index,
             styles={
-                "nav-link": {"border-radius": "10px", "margin": "5px 0"},
-                "nav-link-selected": {"background-color": "#764ba2"},
+                "nav-link": {"border-radius": "8px", "margin": "5px 0", "font-size": "0.9rem"},
+                "nav-link-selected": {"background-color": "#4f46e5", "font-weight": "600"},
             }
         )
         
         st.divider()
-        st.caption("Version 5.0 | Colorful Pro 🌈")
+        st.caption("v5.1 | Enterprise Edition")
 
     # --- 1. HOME PAGE ---
     if selected == "Home":
-        # Colorful Hero
+        # New Tech-Style Hero
         st.markdown("""
             <div class="hero-container">
-                <div class="hero-title">✨ AI Architect</div>
+                <div class="hero-title">AI Architect</div>
                 <div class="hero-subtitle">
-                    Don't just code. <b>Architect.</b><br>
-                    Turn one sentence into a full project folder in seconds! 🚀
+                    The intelligent engine for modern developers. 
+                    Generate production-ready scaffolding in seconds.
                 </div>
             </div>
         """, unsafe_allow_html=True)
         
-        # Big "Start" Button
+        # Centered Launch Button
         c1, c2, c3 = st.columns([1, 2, 1])
         with c2:
-            if st.button("🚀 Launch Builder Now", type="primary", use_container_width=True):
+            if st.button("🚀 Launch Project Builder", type="primary", use_container_width=True):
                 st.session_state.nav_index = 1
                 st.rerun()
         
         st.write("")
-        st.subheader("🔥 Awesome Features")
+        st.write("")
         
-        # Feature Cards
+        # Interactive Feature Cards
         col1, col2, col3 = st.columns(3)
         with col1:
             st.markdown("""
                 <div class="feature-card">
                     <div class="feature-icon">⚡</div>
-                    <div class="feature-title">Lightning Fast</div>
-                    <div class="feature-desc">Get a complete folder structure in under 5 seconds using our optimized AI models.</div>
+                    <div class="feature-title">Rapid Prototyping</div>
+                    <div class="feature-desc">Go from idea to folder structure instantly. No more manual file creation.</div>
                 </div>
             """, unsafe_allow_html=True)
         with col2:
             st.markdown("""
                 <div class="feature-card">
                     <div class="feature-icon">🧠</div>
-                    <div class="feature-title">Smart Code</div>
-                    <div class="feature-desc">We don't just make files; we write valid, running Python code inside them!</div>
+                    <div class="feature-title">Intelligent Logic</div>
+                    <div class="feature-desc">Our AI writes valid Python, React, and SQL boilerplate code for you.</div>
                 </div>
             """, unsafe_allow_html=True)
         with col3:
             st.markdown("""
                 <div class="feature-card">
-                    <div class="feature-icon">🎨</div>
-                    <div class="feature-title">Total Control</div>
-                    <div class="feature-desc">Preview every file, uncheck what you don't need, and download a clean ZIP.</div>
+                    <div class="feature-icon">🛠️</div>
+                    <div class="feature-title">Full Customization</div>
+                    <div class="feature-desc">Interactive tree view allows you to select exactly what you need.</div>
                 </div>
             """, unsafe_allow_html=True)
 
     # --- 2. BUILDER PAGE ---
     elif selected == "Builder":
-        st.title("🛠️ Project Builder")
+        st.title("Project Studio")
         
         if "file_data" not in st.session_state: st.session_state.file_data = {}
 
         col1, col2 = st.columns([1, 1.5], gap="large")
 
         with col1:
-            st.subheader("1. 📝 Describe It")
+            st.subheader("1. Configuration")
             
-            # Fun Mode Indicators
+            # Professional Badges
             mode = st.session_state.complexity
             if mode == "Structure Only":
-                st.info("⚡ **Mode:** Structure Only (Super Fast!)")
+                st.info("**Mode:** Structure Only (Fastest)")
             elif mode == "Simple Code":
-                st.warning("🚀 **Mode:** Simple Code (Drafts & Todos)")
+                st.warning("**Mode:** Simple Code (Skeletons)")
             else:
-                st.success("🧠 **Mode:** Working Code (The Real Deal)")
+                st.success("**Mode:** Working Code (Detailed)")
             
-            user_input = st.text_area("What are we building today?", placeholder="E.g. A Flappy Bird game using Pygame...", height=180)
+            user_input = st.text_area("Describe your project:", placeholder="E.g. A Data Analysis pipeline using Pandas and Matplotlib...", height=180)
             
-            if st.button("✨ Magic Generate", type="primary", use_container_width=True):
+            if st.button("✨ Generate Blueprint", type="primary", use_container_width=True):
                 if user_input:
-                    # Fun status messages
-                    status_label = "🤔 Thinking..."
-                    if mode == "Structure Only": status_label = "⚡ Sketching folder tree..."
-                    elif mode == "Simple Code": status_label = "🚀 Drafting blueprints..."
-                    else: status_label = "🧠 writing code (Grab a coffee ☕, ~45s)..."
+                    status_label = "Processing..."
+                    if mode == "Structure Only": status_label = "Architecting structure..."
+                    elif mode == "Simple Code": status_label = "Drafting code skeletons..."
+                    else: status_label = "Writing full boilerplate code (~45s)..."
 
                     with st.status(status_label, expanded=True) as status:
-                        st.write("🔌 Connecting to Brain...")
+                        st.write("Connecting to AI Engine...")
                         raw = get_ai_response(user_input, complexity=mode)
                         
-                        st.write("📂 Organizing files...")
+                        st.write("Parsing blueprint...")
                         parsed = parse_ai_response(raw)
                         
                         if parsed:
                             st.session_state.file_data = parsed
                             st.session_state.checked_files = list(parsed.keys())
                             st.session_state.tree_key += 1 
-                            status.update(label="🎉 Done! Project Ready.", state="complete", expanded=False)
-                            st.toast("Woohoo! Project created!", icon="🎉")
+                            status.update(label="Blueprint Ready", state="complete", expanded=False)
+                            st.toast("Project generated successfully!", icon="✅")
                         else:
-                            status.update(label="💥 Oops, failed.", state="error")
-                            st.error("AI tripped over its shoelaces. Try again?")
-                            with st.expander("🐛 Debug Info"):
+                            status.update(label="Generation Failed", state="error")
+                            st.error("AI Error. Please try again.")
+                            with st.expander("View Debug Info"):
                                 st.code(raw, language="json")
 
         with col2:
-            st.subheader("2. 👀 Preview & Pick")
+            st.subheader("2. Preview & Export")
             
             with st.container(border=True):
                 if st.session_state.file_data:
                     tree_nodes = convert_to_tree(st.session_state.file_data)
                     all_vals = [n["value"] for n in tree_nodes]
                     
-                    # Selection Buttons
                     current_checked = st.session_state.checked_files
                     all_files = list(st.session_state.file_data.keys())
                     
                     c_btn1, c_btn2 = st.columns(2)
                     with c_btn1:
-                        if st.button("✅ Select All", use_container_width=True):
+                        if st.button("Select All", use_container_width=True):
                             st.session_state.checked_files = all_files
                             st.session_state.tree_key += 1
                             st.rerun()
                     with c_btn2:
-                        if st.button("🧹 Clear All", use_container_width=True):
+                        if st.button("Clear All", use_container_width=True):
                             st.session_state.checked_files = []
                             st.session_state.tree_key += 1
                             st.rerun()
@@ -275,13 +276,12 @@ def main():
                                     st.markdown(f"**📄 {target}**")
                                     st.code(content, language=lang, line_numbers=True)
                             else:
-                                st.info(f"📂 **Folder:** {target}")
+                                st.info(f"📂 Folder: {target}")
                         else:
-                            st.info("👈 Click a file to see the magic!")
+                            st.info("👈 Select a file to view code")
                 else:
-                    st.info("Your masterpiece will appear here! 🎨")
+                    st.info("Your project structure will appear here.")
 
-        # Download Section
         if st.session_state.file_data:
             st.divider()
             files_to_zip = {}
@@ -295,11 +295,11 @@ def main():
             count = len(files_to_zip)
             b1, b2, b3 = st.columns([1, 2, 1])
             with b2:
-                btn_text = f"📥 Download ZIP ({count} Files)" if count > 0 else "⚠️ Select files first!"
+                btn_text = f"📥 Download ZIP ({count} Files)" if count > 0 else "⚠️ Select files to download"
                 st.download_button(
                     label=btn_text,
                     data=create_in_memory_zip(files_to_zip) if count > 0 else b"empty",
-                    file_name="My_AI_Project.zip",
+                    file_name="AI_Project.zip",
                     mime="application/zip",
                     type="primary",
                     use_container_width=True,
@@ -308,69 +308,64 @@ def main():
 
     # --- 3. SETTINGS PAGE ---
     elif selected == "Settings":
-        st.title("⚙️ Settings & Tweaks")
+        st.title("System Settings")
         
         with st.container(border=True):
-            st.subheader("🎚️ Complexity Level")
-            st.caption("How much work should the AI do?")
+            st.subheader("Detail Level")
             complexity_choice = st.selectbox(
-                "Detail Level",
+                "Code Generation Depth",
                 options=["Structure Only", "Simple Code", "Working Code"],
                 index=["Structure Only", "Simple Code", "Working Code"].index(st.session_state.complexity)
             )
-            
-            if complexity_choice == "Structure Only": 
-                st.info("⚡ **Structure Only:** Just folders and empty files. Perfect if you want to code from scratch!")
-            elif complexity_choice == "Simple Code": 
-                st.warning("🚀 **Simple Code:** Adds 'TODO' comments and class definitions. Good for planning.")
-            else: 
-                st.success("🧠 **Working Code:** Writes real, runnable code. Takes longer, but worth it!")
+            if complexity_choice == "Structure Only": st.info("⚡ **Structure Only:** Folders & Empty Files.")
+            elif complexity_choice == "Simple Code": st.warning("🚀 **Simple Code:** Classes & TODOs.")
+            else: st.success("🧠 **Working Code:** Full Logic & Imports.")
 
         with st.container(border=True):
-            st.subheader("🧠 AI Brain")
-            model_mode = st.radio("Choose your Engine:", ["Presets", "Custom ID"], horizontal=True)
+            st.subheader("AI Engine")
+            model_mode = st.radio("Provider:", ["Presets", "Custom ID"], horizontal=True)
             
             if model_mode == "Presets":
                 model_choice = st.selectbox("Select Model:", ["Qwen/Qwen2.5-Coder-32B-Instruct", "google/gemma-2-9b-it"])
-                
-                # HELPFUL INFO BOXES
                 if "Qwen" in model_choice:
-                    st.info("🤖 **Qwen 2.5 (32B):** The Genius. Slower, but writes amazing Python code.")
+                    st.info("🤖 **Qwen 2.5 (32B):** Best for Python/Java logic. Slower.")
                 else:
-                    st.success("🏎️ **Gemma 2 (9B):** The Speedster. Super fast, great for simple projects.")
+                    st.success("🏎️ **Gemma 2 (9B):** Best for speed and simple scripts.")
             else:
-                model_choice = st.text_input("Paste HuggingFace Model ID:", st.session_state.get("selected_model", "Qwen/Qwen2.5-Coder-32B-Instruct"))
+                model_choice = st.text_input("HuggingFace Model ID:", st.session_state.get("selected_model", "Qwen/Qwen2.5-Coder-32B-Instruct"))
 
         with st.container(border=True):
-            st.subheader("🔑 Secret Key")
-            user_token = st.text_input("Hugging Face Token (Optional)", type="password", help="Use your own key for unlimited power!")
+            st.subheader("API Access")
+            user_token = st.text_input("Hugging Face Token (Optional)", type="password")
 
-        if st.button("💾 Save My Settings", type="primary"):
+        if st.button("💾 Save Settings", type="primary"):
             if user_token: st.session_state.user_hf_token = user_token
             st.session_state.selected_model = model_choice
             st.session_state.complexity = complexity_choice
-            st.toast("Settings Saved! Ready to build.", icon="💾")
+            st.toast("Settings Saved!", icon="💾")
 
-    # --- 4. FAQ PAGE (NEW!) ---
+    # --- 4. FAQ PAGE (NEW & EXPANDED) ---
     elif selected == "Help / FAQ":
-        st.title("❓ Help & FAQ")
-        st.markdown("Got questions? We've got answers!")
+        st.title("❓ Help & Support")
         
-        with st.expander("🤔 How do I generate a project?"):
-            st.write("1. Go to the **Builder** tab.")
-            st.write("2. Type what you want (e.g., 'A To-Do List app').")
-            st.write("3. Click **Magic Generate**!")
+        st.markdown("### Common Questions")
         
-        with st.expander("⏳ Why is 'Working Code' slow?"):
-            st.write("Writing code is hard work! The AI is writing hundreds of lines of logic for you. Give it about 45-60 seconds to finish perfectly.")
-            
-        with st.expander("🔑 Do I need an API Key?"):
-            st.write("Nope! The app comes with a free built-in key. However, if you have your own Hugging Face token, adding it in **Settings** might make it faster.")
+        with st.expander("💻 What programming languages are supported?"):
+            st.write("The AI Architect supports **all major languages**. You can ask for Python (Django/Flask), JavaScript (React/Node), Java, C++, or even Rust projects. Just specify the language in your description!")
 
-        with st.expander("🐛 I got a 'Parsing Error'. What do I do?"):
-            st.write("This happens if the AI writes too much and gets cut off. Try switching to **Simple Code** mode or simplify your project description slightly.")
+        with st.expander("🔑 Is my data private?"):
+            st.write("Yes. Your prompts are sent to the Hugging Face Inference API for processing and are not stored by this application. If you use a custom API token, it is only stored in your browser's temporary session.")
 
-    st.markdown('<div class="footer">Made with ❤️ by <b>VishwarajKhatpe</b></div>', unsafe_allow_html=True)
+        with st.expander("💼 Can I use the generated code commercially?"):
+            st.write("Yes! The code generated is boilerplate (standard code). You are free to use it, modify it, and sell projects built with it. However, always review the code for security before deploying to production.")
+
+        with st.expander("⏳ Why does generation take time?"):
+            st.write("We use a powerful **32-Billion Parameter** model (Qwen 2.5). It 'thinks' deeply to ensure your file structure makes sense and your code actually runs. Good architecture takes a moment!")
+
+        st.markdown("### Need more help?")
+        st.info("If you encounter a 'Parsing Error', try reducing the project complexity or switching to 'Simple Code' mode in Settings.")
+
+    st.markdown('<div class="footer">Made by <b>VishwarajKhatpe</b></div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
