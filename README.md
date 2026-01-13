@@ -84,6 +84,7 @@ Q: Is the generated code production-ready? A: The "Working Code" mode produces h
 Q: Why does generation take ~45 seconds? A: We use a large 32-Billion parameter model (Qwen 2.5) to ensure logical consistency across multiple files. This deep reasoning takes a moment, but the result is significantly better than smaller, faster models.
 
 Q: Is my data private? A: Yes. Your prompts are processed via the Hugging Face API and are not stored by this application. If you use a custom API token, it is only stored in your browser's temporary session.
+
 ---
 
 **🤝 Contributing**
