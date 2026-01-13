@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 from streamlit_option_menu import option_menu
 from streamlit_tree_select import tree_select
 from app.api_handler import get_ai_response
@@ -42,7 +43,7 @@ def main():
         st.title("📂 Folder Builder")
         selected = option_menu(None, ["Builder", "Settings"], icons=['folder', 'gear'], menu_icon="cast", default_index=0)
         st.divider()
-        st.caption("Version 3.4: Final Fixed")
+        st.caption("Version 3.5: Better UX")
 
     if selected == "Builder":
         st.title("AI Folder Structure Builder")
@@ -52,25 +53,52 @@ def main():
 
         with col1:
             st.subheader("1. Define Structure")
-            st.caption(f"Active Mode: **{st.session_state.complexity}**")
+            
+            # Helper text for the mode
+            mode = st.session_state.complexity
+            if mode == "Structure Only":
+                st.caption(f"Active Mode: **{mode}** (⚡ Fast)")
+            elif mode == "Simple Code":
+                st.caption(f"Active Mode: **{mode}** (🚀 ~10s)")
+            else:
+                st.caption(f"Active Mode: **{mode}** (🧠 ~45s wait)")
             
             user_input = st.text_area("What do you want to build?", placeholder="E.g. A flask app...", height=150)
             
             if st.button("🔨 Build Structure", type="primary", use_container_width=True):
                 if user_input:
-                    with st.spinner(f"Building ({st.session_state.complexity})..."):
-                        raw = get_ai_response(user_input, complexity=st.session_state.complexity)
+                    # --- NEW LOADING LOGIC ---
+                    # We use st.status instead of st.spinner for better feedback
+                    status_label = "Initializing..."
+                    if mode == "Structure Only":
+                        status_label = "⚡ Generating folder structure..."
+                    elif mode == "Simple Code":
+                        status_label = "🚀 Drafting code skeletons..."
+                    else:
+                        status_label = "🧠 Writing full boilerplate code (Please wait ~45s)..."
+
+                    # st.status creates a container that shows we are working
+                    with st.status(status_label, expanded=True) as status:
+                        st.write("Connecting to AI Brain...")
+                        
+                        # API Call
+                        raw = get_ai_response(user_input, complexity=mode)
+                        
+                        st.write("Parsing response...")
                         parsed = parse_ai_response(raw)
+                        
                         if parsed:
                             st.session_state.file_data = parsed
                             
                             # RESET: Default Select All
                             all_files = list(parsed.keys())
                             st.session_state.checked_files = all_files
-                            st.session_state.tree_key += 1 # Force new tree
+                            st.session_state.tree_key += 1 
                             
+                            status.update(label="✅ Complete!", state="complete", expanded=False)
                             st.toast("✅ Built Successfully!", icon="📂")
                         else:
+                            status.update(label="❌ Failed", state="error")
                             st.error("AI Error. Try again.")
 
         with col2:
@@ -84,7 +112,6 @@ def main():
                     all_files = list(st.session_state.file_data.keys())
                     current_checked = st.session_state.checked_files
                     
-                    # Logic: If nothing is checked, button is "Select All". Otherwise "Clear All".
                     if not current_checked:
                         btn_label = "✅ Select All"
                         new_state = all_files
@@ -92,29 +119,24 @@ def main():
                         btn_label = "⬜ Clear All"
                         new_state = []
                     
-                    # The Button
                     if st.button(btn_label, type="secondary"):
                         st.session_state.checked_files = new_state
-                        st.session_state.tree_key += 1 # CRITICAL: This forces the visual update
+                        st.session_state.tree_key += 1 
                         st.rerun()
 
                     c1, c2 = st.columns([1, 2])
                     with c1:
-                        # --- TREE VIEW ---
                         selected_tree = tree_select(
                             tree_nodes, 
-                            key=f"tree_{st.session_state.tree_key}", # Dynamic key forces redraw
+                            key=f"tree_{st.session_state.tree_key}", 
                             checked=st.session_state.checked_files,
                             expanded=all_vals, 
                             no_cascade=False
                         )
-                        
-                        # Sync user clicks back to state
                         if selected_tree["checked"] != st.session_state.checked_files:
                             st.session_state.checked_files = selected_tree["checked"]
                     
                     with c2:
-                        # Code Preview
                         if selected_tree['checked']:
                             target = selected_tree['checked'][0]
                             if target in st.session_state.file_data:
@@ -134,7 +156,6 @@ def main():
         if st.session_state.file_data:
             st.divider()
             files_to_zip = {}
-            # Use SESSION STATE as the source of truth
             checked_list = st.session_state.checked_files
             
             if checked_list:
