@@ -22,31 +22,30 @@ def get_ai_response(user_prompt: str, complexity: str = "Working Code") -> str:
     client = InferenceClient(token=token)
     model_id = st.session_state.get("selected_model", "Qwen/Qwen2.5-Coder-32B-Instruct")
 
-    # --- SPEED OPTIMIZATION ---
+    # --- TOKEN LIMITS UPGRADED ---
     if complexity == "Structure Only":
-        # Ultra-short prompt for maximum speed
         system_instruction = (
-            "You are a fast JSON generator. "
-            "Return a JSON dict of file paths for this project. "
-            "Values MUST be empty strings. "
-            "NO explanations. NO markdown."
+            "You are a JSON generator. Return a JSON dict of file paths with empty values. "
+            "Strictly JSON only. No markdown."
         )
-        max_tokens = 300 # Reduced to force brevity
+        max_tokens = 500
         
     elif complexity == "Simple Code":
         system_instruction = (
-            "You are a Software Architect. "
-            "Return JSON where values are SKELETON code (class/def only, pass body). "
-            "NO markdown."
+            "You are a Software Architect. Return JSON where values are SKELETON code (class/def signatures only). "
+            "Strictly JSON only. No markdown."
         )
-        max_tokens = 1000
+        max_tokens = 1500
         
     else: # Working Code
         system_instruction = (
             "You are a Senior Developer. "
-            "Return JSON with FULL WORKING boilerplate code and a README.md."
+            "Return a valid JSON dictionary where keys are paths and values are WORKING CODE. "
+            "Do NOT stop mid-stream. Keep code concise to fit in JSON. "
+            "Strictly JSON only. No markdown intro/outro."
         )
-        max_tokens = 2000
+        # BUMPED TO 4096 (Max safe limit)
+        max_tokens = 4096
 
     messages = [
         {"role": "system", "content": system_instruction},

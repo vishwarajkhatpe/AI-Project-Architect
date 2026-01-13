@@ -67,21 +67,13 @@ def main():
             
             if st.button("🔨 Build Structure", type="primary", use_container_width=True):
                 if user_input:
-                    # --- NEW LOADING LOGIC ---
-                    # We use st.status instead of st.spinner for better feedback
                     status_label = "Initializing..."
-                    if mode == "Structure Only":
-                        status_label = "⚡ Generating folder structure..."
-                    elif mode == "Simple Code":
-                        status_label = "🚀 Drafting code skeletons..."
-                    else:
-                        status_label = "🧠 Writing full boilerplate code (Please wait ~45s)..."
+                    if mode == "Structure Only": status_label = "⚡ Generating structure..."
+                    elif mode == "Simple Code": status_label = "🚀 Drafting skeletons..."
+                    else: status_label = "🧠 Writing full code (This takes time)..."
 
-                    # st.status creates a container that shows we are working
                     with st.status(status_label, expanded=True) as status:
                         st.write("Connecting to AI Brain...")
-                        
-                        # API Call
                         raw = get_ai_response(user_input, complexity=mode)
                         
                         st.write("Parsing response...")
@@ -89,17 +81,19 @@ def main():
                         
                         if parsed:
                             st.session_state.file_data = parsed
-                            
-                            # RESET: Default Select All
                             all_files = list(parsed.keys())
                             st.session_state.checked_files = all_files
                             st.session_state.tree_key += 1 
-                            
                             status.update(label="✅ Complete!", state="complete", expanded=False)
                             st.toast("✅ Built Successfully!", icon="📂")
                         else:
-                            status.update(label="❌ Failed", state="error")
-                            st.error("AI Error. Try again.")
+                            # --- NEW DEBUG VIEW ---
+                            status.update(label="⚠️ Parsing Failed", state="error")
+                            st.error("The AI generated code, but the JSON format broke (likely too long).")
+                            
+                            with st.expander("👀 View Raw AI Output (Debug)"):
+                                st.text("You can copy valid code from here manually if needed:")
+                                st.code(raw, language="json")
 
         with col2:
             st.subheader("2. Preview & Select")
