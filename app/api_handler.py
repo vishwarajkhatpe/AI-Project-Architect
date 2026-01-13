@@ -15,31 +15,43 @@ def get_api_token():
     except: pass
     return os.getenv("HF_TOKEN")
 
-# UPDATED: Added 'structure_only' parameter
-def get_ai_response(user_prompt: str, structure_only: bool = False) -> str:
+# UPDATED: Now accepts a 'complexity' string
+def get_ai_response(user_prompt: str, complexity: str = "Working Code") -> str:
     token = get_api_token()
     if not token: return "Error: API Token missing."
     
     client = InferenceClient(token=token)
     model_id = st.session_state.get("selected_model", "Qwen/Qwen2.5-Coder-32B-Instruct")
 
-    # --- TWO DIFFERENT MODES ---
-    if structure_only:
-        # MODE A: Fast, Structure Only
+    # --- THREE LEVELS OF COMPLEXITY ---
+    if complexity == "Structure Only":
+        # Level 1: Just files, no content
         system_instruction = (
             "You are a Directory Architect. "
-            "Return a JSON dictionary of file paths for the user's project. "
-            "Values should be empty strings. "
-            "Example: {'src/main.py': '', 'tests/test_api.py': ''}. "
-            "Do NOT write any code inside the files."
+            "Return a JSON dictionary of file paths. "
+            "Values MUST be empty strings. "
+            "Example: {'src/main.py': '', 'tests/test_api.py': ''}."
         )
-    else:
-        # MODE B: Full Code (The one we had before)
+        max_tokens = 500
+        
+    elif complexity == "Simple Code":
+        # Level 2: Skeletons and TODOs
         system_instruction = (
-            "You are a Senior DevOps Engineer. "
-            "Return a JSON dictionary where keys are paths and values are BOILERPLATE CODE. "
-            "Include a README.md explaining the structure."
+            "You are a Software Architect. "
+            "Return a JSON dictionary where values are SKELETON code. "
+            "Include class names, function definitions, and docstrings, but use 'pass' for the body. "
+            "Example: {'main.py': 'def run():\\n    # TODO: Add logic\\n    pass'}"
         )
+        max_tokens = 1000
+        
+    else: # "Working Code"
+        # Level 3: Full logic
+        system_instruction = (
+            "You are a Senior Developer. "
+            "Return a JSON dictionary where values are FULL WORKING boilerplate code. "
+            "Include imports, error handling, and a README.md."
+        )
+        max_tokens = 2000
 
     messages = [
         {"role": "system", "content": system_instruction},
@@ -50,8 +62,7 @@ def get_ai_response(user_prompt: str, structure_only: bool = False) -> str:
         response = client.chat_completion(
             model=model_id,
             messages=messages,
-            # We need fewer tokens for structure only
-            max_tokens=500 if structure_only else 2000, 
+            max_tokens=max_tokens,
             temperature=0.1
         )
         return response.choices[0].message.content

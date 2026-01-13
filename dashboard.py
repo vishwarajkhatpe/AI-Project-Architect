@@ -32,12 +32,17 @@ def convert_to_tree(file_data):
     return nodes
 
 def main():
+    # Load default settings if not present
+    if "complexity" not in st.session_state: st.session_state.complexity = "Working Code"
+    if "selected_model" not in st.session_state: st.session_state.selected_model = "Qwen/Qwen2.5-Coder-32B-Instruct"
+
     with st.sidebar:
         st.title("📂 Folder Builder")
         selected = option_menu(None, ["Builder", "Settings"], icons=['folder', 'gear'], menu_icon="cast", default_index=0)
         st.divider()
-        st.caption("Version 3.0: Structure First")
+        st.caption("Version 3.1: 3-Level Logic")
 
+    # --- BUILDER PAGE ---
     if selected == "Builder":
         st.title("AI Folder Structure Builder")
         if "file_data" not in st.session_state: st.session_state.file_data = {}
@@ -47,25 +52,20 @@ def main():
         with col1:
             st.subheader("1. Define Structure")
             
-            # --- V3 FEATURE: STRUCTURE MODE TOGGLE ---
-            st.info("Choose your mode:")
-            mode = st.radio("Generation Mode:", 
-                ["Structure Only (Fast)", "Full Boilerplate Code (Slow)"], 
-                horizontal=True
-            )
-            structure_only = True if "Structure Only" in mode else False
+            # Show current settings summary (User feedback)
+            st.caption(f"Current Mode: **{st.session_state.complexity}** (Change in Settings)")
 
-            user_input = st.text_area("What do you want to build?", placeholder="E.g. A Django project with a React frontend folder...", height=150)
+            user_input = st.text_area("What do you want to build?", placeholder="E.g. A Django project...", height=150)
             
             if st.button("🔨 Build Structure", type="primary", use_container_width=True):
                 if user_input:
-                    with st.spinner("Processing..."):
-                        # Pass the mode to the backend
-                        raw = get_ai_response(user_input, structure_only=structure_only)
+                    with st.spinner(f"Building ({st.session_state.complexity} mode)..."):
+                        # Pass the saved complexity setting to the backend
+                        raw = get_ai_response(user_input, complexity=st.session_state.complexity)
                         parsed = parse_ai_response(raw)
                         if parsed:
                             st.session_state.file_data = parsed
-                            st.toast("✅ Structure Built!", icon="📂")
+                            st.toast("✅ Built Successfully!", icon="📂")
                         else:
                             st.error("AI Error. Try again.")
 
@@ -78,10 +78,8 @@ def main():
                     
                     c1, c2 = st.columns([1, 2])
                     with c1:
-                        # Tree View
                         selected_tree = tree_select(tree_nodes, no_cascade=True, expanded=all_vals)
                     with c2:
-                        # Code View (Shows "Empty File" if in Structure Mode)
                         if selected_tree['checked']:
                             f = selected_tree['checked'][0]
                             if f in st.session_state.file_data:
@@ -100,13 +98,10 @@ def main():
             # Selective Download Logic
             selected_files_only = {}
             checked_items = selected_tree.get('checked', [])
-            
             if checked_items:
                 for f in checked_items:
                     if f in st.session_state.file_data:
                         selected_files_only[f] = st.session_state.file_data[f]
-            
-            # If nothing checked, download everything (fallback)
             final_data = selected_files_only if selected_files_only else st.session_state.file_data
             
             b1, b2, b3 = st.columns([1, 2, 1])
@@ -120,25 +115,50 @@ def main():
                     use_container_width=True
                 )
 
+    # --- SETTINGS PAGE (UPDATED) ---
     elif selected == "Settings":
         st.title("⚙️ Configuration")
+        
+        # 1. GENERATION COMPLEXITY (NEW!)
+        with st.container(border=True):
+            st.subheader("🎚️ Output Detail Level")
+            st.write("Control how much code the AI writes.")
+            
+            complexity_choice = st.select_slider(
+                "Select Detail Level:",
+                options=["Structure Only", "Simple Code", "Working Code"],
+                value=st.session_state.get("complexity", "Working Code")
+            )
+            
+            # Explanations for the user
+            if complexity_choice == "Structure Only":
+                st.info("⚡ **Fastest:** Generates empty files and folders only. Good for starting from scratch.")
+            elif complexity_choice == "Simple Code":
+                st.info("🚀 **Balanced:** Generates class definitions, functions, and TODO comments. Good for prototyping.")
+            else:
+                st.info("🧠 **Detailed:** Generates full boilerplate logic, imports, and READMEs. Takes longer.")
+
+        # 2. MODEL ENGINE
+        with st.container(border=True):
+            st.subheader("🧠 AI Model Engine")
+            model_mode = st.radio("Select Source:", ["Official Presets", "Custom Model ID"], horizontal=True)
+            if model_mode == "Official Presets":
+                model_choice = st.selectbox("Choose Model:", ["Qwen/Qwen2.5-Coder-32B-Instruct", "google/gemma-2-9b-it"], index=0)
+            else:
+                model_choice = st.text_input("Enter HuggingFace Model ID:", st.session_state.get("selected_model", "Qwen/Qwen2.5-Coder-32B-Instruct"))
+
+        # 3. API KEY
         with st.container(border=True):
             st.subheader("🔑 API Access")
             st.info("Add your custom API key (Overrides local defaults).")
             user_token = st.text_input("Hugging Face Token", type="password")
 
-        with st.container(border=True):
-            st.subheader("🧠 AI Model Engine")
-            model_mode = st.radio("Select Source:", ["Official Presets", "Custom Model ID"], horizontal=True)
-            if model_mode == "Official Presets":
-                model_choice = st.selectbox("Choose Model:", ["Qwen/Qwen2.5-Coder-32B-Instruct", "google/gemma-2-9b-it"])
-            else:
-                model_choice = st.text_input("Enter HuggingFace Model ID:", "Qwen/Qwen2.5-Coder-32B-Instruct")
-
+        st.write("")
         if st.button("💾 Apply Settings", type="primary"):
             if user_token: st.session_state.user_hf_token = user_token
             st.session_state.selected_model = model_choice
-            st.toast("✅ Settings Saved!", icon="💾")
+            st.session_state.complexity = complexity_choice # SAVE THE SETTING
+            st.toast("✅ Configuration Updated!", icon="💾")
 
     st.markdown('<div class="footer">Created by <b>VishwarajKhatpe</b></div>', unsafe_allow_html=True)
 
