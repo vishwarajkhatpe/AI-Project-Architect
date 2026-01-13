@@ -1,0 +1,9 @@
+# Python safety
+__pycache__/
+*.pyc
+
+# Environment safety (NEVER upload these)
+.env
+venv/
+.venv/
+.DS_Store
