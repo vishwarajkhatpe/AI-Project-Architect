@@ -15,7 +15,6 @@ def get_api_token():
     except: pass
     return os.getenv("HF_TOKEN")
 
-# UPDATED: Now accepts a 'complexity' string
 def get_ai_response(user_prompt: str, complexity: str = "Working Code") -> str:
     token = get_api_token()
     if not token: return "Error: API Token missing."
@@ -23,39 +22,35 @@ def get_ai_response(user_prompt: str, complexity: str = "Working Code") -> str:
     client = InferenceClient(token=token)
     model_id = st.session_state.get("selected_model", "Qwen/Qwen2.5-Coder-32B-Instruct")
 
-    # --- THREE LEVELS OF COMPLEXITY ---
+    # --- SPEED OPTIMIZATION ---
     if complexity == "Structure Only":
-        # Level 1: Just files, no content
+        # Ultra-short prompt for maximum speed
         system_instruction = (
-            "You are a Directory Architect. "
-            "Return a JSON dictionary of file paths. "
+            "You are a fast JSON generator. "
+            "Return a JSON dict of file paths for this project. "
             "Values MUST be empty strings. "
-            "Example: {'src/main.py': '', 'tests/test_api.py': ''}."
+            "NO explanations. NO markdown."
         )
-        max_tokens = 500
+        max_tokens = 300 # Reduced to force brevity
         
     elif complexity == "Simple Code":
-        # Level 2: Skeletons and TODOs
         system_instruction = (
             "You are a Software Architect. "
-            "Return a JSON dictionary where values are SKELETON code. "
-            "Include class names, function definitions, and docstrings, but use 'pass' for the body. "
-            "Example: {'main.py': 'def run():\\n    # TODO: Add logic\\n    pass'}"
+            "Return JSON where values are SKELETON code (class/def only, pass body). "
+            "NO markdown."
         )
         max_tokens = 1000
         
-    else: # "Working Code"
-        # Level 3: Full logic
+    else: # Working Code
         system_instruction = (
             "You are a Senior Developer. "
-            "Return a JSON dictionary where values are FULL WORKING boilerplate code. "
-            "Include imports, error handling, and a README.md."
+            "Return JSON with FULL WORKING boilerplate code and a README.md."
         )
         max_tokens = 2000
 
     messages = [
         {"role": "system", "content": system_instruction},
-        {"role": "user", "content": f"Project Idea: {user_prompt}"}
+        {"role": "user", "content": user_prompt}
     ]
 
     try:
