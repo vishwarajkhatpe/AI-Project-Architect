@@ -1,3 +1,5 @@
+from app.api_handler import get_ai_response
+
 # test_local.py
 import logging
 from app.utils import parse_ai_response
@@ -33,6 +35,16 @@ def run_tests():
             
     except Exception as e:
         print(f"❌ ZIP Test CRASHED: {e}")
+    
+    # TEST 3: Check API Connection
+    print("\n3. Testing AI Connection (This connects to the internet)...")
+    ai_text = get_ai_response("A simple calculator app with python")
+    print(f"🔹 AI Raw Response: {ai_text[:100]}...") # Print first 100 chars
+
+    if "Error" not in ai_text:
+        print("✅ API Test PASSED: Received response from Hugging Face.")
+    else:
+        print("❌ API Test FAILED: Check your .env token.")
 
     print("\n--- 🏁 Verification Complete ---")
 

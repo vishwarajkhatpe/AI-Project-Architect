@@ -2,3 +2,5 @@ streamlit
 requests
 python-dotenv
 huggingface_hub
+streamlit-option-menu
+streamlit-tree-select
