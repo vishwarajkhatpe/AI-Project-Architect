@@ -131,7 +131,7 @@ def main():
             st.toast("✅ Settings Saved!", icon="💾")
             st.success(f"Model set to: **{model_choice}**")
 
-    st.markdown('<div class="footer">Created by <b>YourName</b></div>', unsafe_allow_html=True)
+    st.markdown('<div class="footer">Created by <b>VishwarajKhatpe</b></div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
