@@ -41,7 +41,7 @@ If you prefer to run this locally instead of on the cloud:
    ```bash
    git clone [https://github.com vishwarajkhatpe/AI-Project-Architect.git](https://github.com/vishwarajkhatpe/AI-Project-Architect.git)
 
-   cd AI-Architect
+   cd AI-Project-Architect
 
 2. **Install dependencies**
     '''bash
@@ -59,35 +59,42 @@ If you prefer to run this locally instead of on the cloud:
 ---
 
 
-**📂 Project Structure**
+## **📂 Project Structure**
 
+```text
 AI-Architect/
 ├── app/
-│   ├── __init__.py      # Package marker
-│   ├── api_handler.py   # AI Model interaction logic
-│   └── utils.py         # Robust JSON parser & error handler
+│   ├── __init__.py      # Required: Makes 'app' a package
+│   ├── api_handler.py   # AI Logic
+│   └── utils.py         # Response Parser
 ├── core/
-│   ├── __init__.py
-│   └── creator.py       # ZIP file generation logic
+│   ├── __init__.py      # Required: Makes 'core' a package
+│   └── creator.py       # ZIP Creator
 ├── .streamlit/
-│   └── config.toml      # UI Theme configuration
-├── dashboard.py         # Main Application Entry Point
-├── requirements.txt     # Python dependencies
-└── README.md            # Documentation
+│   └── config.toml      # Theme Settings
+├── .gitignore           # Ignored files
+├── dashboard.py         # Main App
+├── requirements.txt     # Dependencies
+└── README.md            # Docs
+```
 
 ---
 
 
-**❓ FAQ**
-Q: Is the generated code production-ready? A: The "Working Code" mode produces high-quality boilerplate. However, you should always review AI-generated code for security and specific business logic requirements before deploying to production.
+**❓ FAQ**</br>
 
-Q: Why does generation take ~45 seconds? A: We use a large 32-Billion parameter model (Qwen 2.5) to ensure logical consistency across multiple files. This deep reasoning takes a moment, but the result is significantly better than smaller, faster models.
+Q: Is the generated code production-ready?</br> 
+A: The "Working Code" mode produces high-quality boilerplate. However, you should always review AI-generated code for security and specific business logic requirements before deploying to production.
 
-Q: Is my data private? A: Yes. Your prompts are processed via the Hugging Face API and are not stored by this application. If you use a custom API token, it is only stored in your browser's temporary session.
+Q: Why does generation take ~45 seconds? </br>A: We use a large 32-Billion parameter model (Qwen 2.5) to ensure logical consistency across multiple files. This deep reasoning takes a moment, but the result is significantly better than smaller, faster models.
+
+Q: Is my data private? </br>
+A: Yes. Your prompts are processed via the Hugging Face API and are not stored by this application. If you use a custom API token, it is only stored in your browser's temporary session.
 
 ---
 
-**🤝 Contributing**
+**🤝 Contributing**:
+
 Contributions are welcome! Please fork the repository and submit a Pull Request.
 
 1. Fork the Project
