@@ -7,9 +7,9 @@ from app.utils import parse_ai_response
 from core.creator import create_in_memory_zip
 
 # 1. Page Config
-st.set_page_config(page_title="AI Architect", page_icon="🏗️", layout="wide")
+st.set_page_config(page_title="AI Architect v5.2", page_icon="🏗️", layout="wide")
 
-# 2. CSS STYLING
+# 2. CSS STYLING (Smart Scrolling & Original Design)
 st.markdown("""
     <style>
     @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -49,59 +49,79 @@ st.markdown("""
         text-align: center; padding: 12px;
         font-size: 0.8rem; border-top: 1px solid #f3f4f6; z-index: 100;
     }
+
+    /* --- SMART SCROLLING CSS --- */
+    
+    /* 1. Force Scrollbars to appear ONLY when needed (Auto) */
+    div[data-testid="stVerticalBlockBorderWrapper"] > div > div {
+        overflow: auto !important; 
+    }
+
+    /* 2. Prevent text from wrapping (Forces Horizontal Scroll if text is long) */
+    .stTreeSelect div {
+        white-space: nowrap !important;
+        width: max-content; /* Ensure container grows to fit the widest text */
+    }
     </style>
 """, unsafe_allow_html=True)
 
-def convert_to_tree(file_data):
-    nodes = []
-    for path in file_data.keys():
+# --- RECURSIVE TREE CONVERTER ---
+def convert_to_tree(file_data_keys):
+    """
+    Converts a list of paths ['src/utils/helper.py'] 
+    into nested dictionary format for streamlit-tree-select.
+    """
+    tree_nodes = []
+    for path in file_data_keys:
         parts = path.split('/')
-        if len(parts) == 1:
-            nodes.append({"label": parts[0], "value": path})
-        else:
-            folder = parts[0]
-            existing = next((n for n in nodes if n["label"] == folder), None)
-            if not existing:
-                existing = {"label": folder, "value": folder, "children": []}
-                nodes.append(existing)
-            existing["children"].append({"label": parts[-1], "value": path})
-    return nodes
+        current_level = tree_nodes
+        current_full_path = ""
+        for i, part in enumerate(parts):
+            current_full_path = f"{current_full_path}/{part}" if current_full_path else part
+            existing_node = next((node for node in current_level if node['label'] == part), None)
+            if existing_node:
+                if 'children' in existing_node:
+                    current_level = existing_node['children']
+            else:
+                is_file = (i == len(parts) - 1)
+                new_node = {"label": part, "value": current_full_path, "showCheckbox": True}
+                if not is_file:
+                    new_node["children"] = []
+                    current_level.append(new_node)
+                    current_level = new_node["children"]
+                else:
+                    current_level.append(new_node)
+    return tree_nodes
 
 def main():
     if "complexity" not in st.session_state: st.session_state.complexity = "Working Code"
     if "tree_key" not in st.session_state: st.session_state.tree_key = 0
     if "checked_files" not in st.session_state: st.session_state.checked_files = []
     if "nav_index" not in st.session_state: st.session_state.nav_index = 0
-    # FIX: Add a menu key to force redraws
     if "menu_key" not in st.session_state: st.session_state.menu_key = 0
 
     with st.sidebar:
         st.image("https://cdn-icons-png.flaticon.com/512/3767/3767084.png", width=55)
         st.markdown("### AI Architect")
         
-        # NAVIGATION FIX
-        # We use a dynamic key 'menu_key'. When this changes, the menu rebuilds completely.
+        # NAVIGATION
         menu_options = ["Home", "Builder", "Settings", "Help / FAQ"]
-        
         selected = option_menu(
             menu_title=None,
             options=menu_options, 
             icons=['house', 'hammer', 'sliders', 'question-circle'], 
             default_index=st.session_state.nav_index,
-            # THE SECRET SAUCE: Changing this key forces the component to re-render with the new index
             key=f"menu_{st.session_state.menu_key}", 
             styles={
                 "nav-link": {"border-radius": "8px", "margin": "5px 0", "font-size": "0.9rem"},
                 "nav-link-selected": {"background-color": "#4f46e5", "font-weight": "600"},
             }
         )
-        
-        # SYNC: If user clicks menu manually, update our index variable
         if menu_options.index(selected) != st.session_state.nav_index:
             st.session_state.nav_index = menu_options.index(selected)
         
         st.divider()
-        st.caption("v5.1 | Stable Release")
+        st.caption("v5.2 | Subfolder Support")
 
     # --- 1. HOME PAGE ---
     if selected == "Home":
@@ -117,61 +137,36 @@ def main():
         
         c1, c2, c3 = st.columns([1, 2, 1])
         with c2:
-            # BUTTON FIX: Updates Index AND increments Menu Key to force sidebar update
             if st.button("🚀 Launch Project Builder", type="primary", use_container_width=True):
-                st.session_state.nav_index = 1  # Set to Builder
-                st.session_state.menu_key += 1  # Force Sidebar Redraw
+                st.session_state.nav_index = 1  
+                st.session_state.menu_key += 1  
                 st.rerun()
         
         st.write("")
         st.write("")
-        
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.markdown("""
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <div class="feature-title">Rapid Prototyping</div>
-                    <div class="feature-desc">Go from idea to folder structure instantly. No more manual file creation.</div>
-                </div>
-            """, unsafe_allow_html=True)
+            st.markdown('<div class="feature-card"><div class="feature-icon">⚡</div><div class="feature-title">Rapid Prototyping</div><div class="feature-desc">Go from idea to folder structure instantly. No more manual file creation.</div></div>', unsafe_allow_html=True)
         with col2:
-            st.markdown("""
-                <div class="feature-card">
-                    <div class="feature-icon">🧠</div>
-                    <div class="feature-title">Intelligent Logic</div>
-                    <div class="feature-desc">Our AI writes valid Python, React, and SQL boilerplate code for you.</div>
-                </div>
-            """, unsafe_allow_html=True)
+            st.markdown('<div class="feature-card"><div class="feature-icon">🧠</div><div class="feature-title">Intelligent Logic</div><div class="feature-desc">Our AI writes valid Python, React, and SQL boilerplate code for you.</div></div>', unsafe_allow_html=True)
         with col3:
-            st.markdown("""
-                <div class="feature-card">
-                    <div class="feature-icon">🛠️</div>
-                    <div class="feature-title">Full Customization</div>
-                    <div class="feature-desc">Interactive tree view allows you to select exactly what you need.</div>
-                </div>
-            """, unsafe_allow_html=True)
+            st.markdown('<div class="feature-card"><div class="feature-icon">🛠️</div><div class="feature-title">Full Customization</div><div class="feature-desc">Interactive tree view allows you to select exactly what you need.</div></div>', unsafe_allow_html=True)
 
     # --- 2. BUILDER PAGE ---
     elif selected == "Builder":
         st.title("Project Studio")
-        
         if "file_data" not in st.session_state: st.session_state.file_data = {}
 
         col1, col2 = st.columns([1, 1.5], gap="large")
 
         with col1:
             st.subheader("1. Configuration")
-            
             mode = st.session_state.complexity
-            if mode == "Structure Only":
-                st.info("**Mode:** Structure Only (Fastest)")
-            elif mode == "Simple Code":
-                st.warning("**Mode:** Simple Code (Skeletons)")
-            else:
-                st.success("**Mode:** Working Code (Detailed)")
+            if mode == "Structure Only": st.info("**Mode:** Structure Only (Fastest)")
+            elif mode == "Simple Code": st.warning("**Mode:** Simple Code (Skeletons)")
+            else: st.success("**Mode:** Working Code (Detailed)")
             
-            user_input = st.text_area("Describe your project:", placeholder="E.g. A Data Analysis pipeline using Pandas and Matplotlib...", height=180)
+            user_input = st.text_area("Describe your project:", placeholder="E.g. A Data Analysis pipeline using Pandas...", height=180)
             
             if st.button("✨ Generate Blueprint", type="primary", use_container_width=True):
                 if user_input:
@@ -182,7 +177,11 @@ def main():
 
                     with st.status(status_label, expanded=True) as status:
                         st.write("Connecting to AI Engine...")
-                        raw = get_ai_response(user_input, complexity=mode)
+                        api_key = st.session_state.get("user_hf_token", None)
+                        if not api_key and "HF_TOKEN" in st.secrets:
+                            api_key = st.secrets["HF_TOKEN"]
+                            
+                        raw = get_ai_response(user_input, api_key=api_key, complexity=mode)
                         
                         st.write("Parsing blueprint...")
                         parsed = parse_ai_response(raw)
@@ -204,61 +203,81 @@ def main():
             
             with st.container(border=True):
                 if st.session_state.file_data:
-                    tree_nodes = convert_to_tree(st.session_state.file_data)
-                    all_vals = [n["value"] for n in tree_nodes]
+                    file_keys = list(st.session_state.file_data.keys())
+                    tree_nodes = convert_to_tree(file_keys)
                     
-                    c_btn1, c_btn2 = st.columns(2)
-                    with c_btn1:
+                    all_vals = []
+                    def get_all_values(nodes):
+                        for node in nodes:
+                            all_vals.append(node["value"])
+                            if "children" in node: get_all_values(node["children"])
+                    get_all_values(tree_nodes)
+                    
+                    # Controls
+                    c_ctrl1, c_ctrl2, c_ctrl3 = st.columns([1, 1, 1.5])
+                    with c_ctrl1:
                         if st.button("Select All", use_container_width=True):
                             st.session_state.checked_files = list(st.session_state.file_data.keys())
                             st.session_state.tree_key += 1
                             st.rerun()
-                    with c_btn2:
+                    with c_ctrl2:
                         if st.button("Clear All", use_container_width=True):
                             st.session_state.checked_files = []
                             st.session_state.tree_key += 1
                             st.rerun()
-
-                    c1, c2 = st.columns([1, 2])
-                    with c1:
-                        selected_tree = tree_select(
-                            tree_nodes, 
-                            key=f"tree_{st.session_state.tree_key}", 
-                            checked=st.session_state.checked_files,
-                            expanded=all_vals, 
-                            no_cascade=False
+                    with c_ctrl3:
+                        # FIX: Add a callback to force-redraw the tree when toggled
+                        def on_toggle_change():
+                            st.session_state.tree_key += 1
+                            
+                        expand_mode = st.toggle(
+                            "Expand Folders", 
+                            value=True, 
+                            on_change=on_toggle_change
                         )
-                        if selected_tree["checked"] != st.session_state.checked_files:
-                            st.session_state.checked_files = selected_tree["checked"]
+                        expanded_items = all_vals if expand_mode else []
+
+                    c1, c2 = st.columns([1, 1])
+                    
+                    with c1:
+                        st.caption("📂 Structure")
+                        # 1. FIXED HEIGHT: This container will scroll if content > 500px
+                        with st.container(height=500, border=True):
+                            selected_tree = tree_select(
+                                tree_nodes, 
+                                key=f"tree_{st.session_state.tree_key}", 
+                                checked=st.session_state.checked_files,
+                                expanded=expanded_items, 
+                                no_cascade=False
+                            )
+                            if selected_tree["checked"] != st.session_state.checked_files:
+                                st.session_state.checked_files = selected_tree["checked"]
+                                st.rerun()
                     
                     with c2:
-                        if selected_tree['checked']:
-                            target = selected_tree['checked'][0]
-                            if target in st.session_state.file_data:
-                                content = st.session_state.file_data[target]
-                                if not content.strip():
-                                    st.info(f"📄 `{target}` is empty")
+                        st.caption("📝 Code Viewer")
+                        # 2. FIXED HEIGHT: Match the tree height
+                        with st.container(height=500, border=True):
+                            if selected_tree['checked']:
+                                target = selected_tree['checked'][0]
+                                if target in st.session_state.file_data:
+                                    content = st.session_state.file_data[target]
+                                    if not content.strip():
+                                        st.info(f"📄 `{target}` is empty")
+                                    else:
+                                        lang = "python" if target.endswith(".py") else "text"
+                                        st.markdown(f"**📄 {target}**")
+                                        st.code(content, language=lang, line_numbers=True)
                                 else:
-                                    lang = "python" if target.endswith(".py") else "text"
-                                    st.markdown(f"**📄 {target}**")
-                                    st.code(content, language=lang, line_numbers=True)
+                                    st.info(f"📂 Folder: {target}")
                             else:
-                                st.info(f"📂 Folder: {target}")
-                        else:
-                            st.info("👈 Select a file to view code")
+                                st.info("👈 Select a file to view code")
                 else:
                     st.info("Your project structure will appear here.")
 
         if st.session_state.file_data:
             st.divider()
-            files_to_zip = {}
-            checked_list = st.session_state.checked_files
-            
-            if checked_list:
-                for f in checked_list:
-                    if f in st.session_state.file_data:
-                        files_to_zip[f] = st.session_state.file_data[f]
-            
+            files_to_zip = {f: st.session_state.file_data[f] for f in st.session_state.checked_files if f in st.session_state.file_data}
             count = len(files_to_zip)
             b1, b2, b3 = st.columns([1, 2, 1])
             with b2:
@@ -316,18 +335,14 @@ def main():
         st.title("❓ Help & Support")
         
         st.markdown("### Common Questions")
-        
         with st.expander("💻 What programming languages are supported?"):
             st.write("The AI Architect supports **all major languages**. You can ask for Python (Django/Flask), JavaScript (React/Node), Java, C++, or even Rust projects. Just specify the language in your description!")
 
         with st.expander("🔑 Is my data private?"):
-            st.write("Yes. Your prompts are sent to the Hugging Face Inference API for processing and are not stored by this application. If you use a custom API token, it is only stored in your browser's temporary session.")
+            st.write("Yes. Your prompts are sent to the Hugging Face Inference API for processing and are not stored by this application.")
 
         with st.expander("💼 Can I use the generated code commercially?"):
-            st.write("Yes! The code generated is boilerplate (standard code). You are free to use it, modify it, and sell projects built with it. However, always review the code for security before deploying to production.")
-
-        with st.expander("⏳ Why does generation take time?"):
-            st.write("We use a powerful **32-Billion Parameter** model (Qwen 2.5). It 'thinks' deeply to ensure your file structure makes sense and your code actually runs. Good architecture takes a moment!")
+            st.write("Yes! The code generated is boilerplate (standard code). You are free to use it, modify it, and sell projects built with it.")
 
         st.markdown("### Need more help?")
         st.info("If you encounter a 'Parsing Error', try reducing the project complexity or switching to 'Simple Code' mode in Settings.")
