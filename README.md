@@ -9,7 +9,17 @@
 
 ---
 
+## 🚀 What's New in v5.2?
+
+We have completely overhauled the parsing engine and UI to handle complex, enterprise-level project structures.
+
+* **📂 Infinite Subfolder Support:** The new Recursive Parser can generate deeply nested trees (e.g., `src/components/ui/buttons/primary.tsx`).
+* **📜 Scrollable Tree View:** Fixed layout issues for large projects. The tree view now supports horizontal and vertical scrolling within a fixed container.
+* **🧠 Smarter AI Logic:** switched to `huggingface_hub` with One-Shot Prompting to ensure strict JSON output and prevent "lazy" code generation.
+* **✨ UI Enhancements:** Added an "Expand/Collapse All" toggle and optimized the layout to a 50/50 split for better visibility.
 ## ✨ Features
+
+---
 
 - **🚀 Instant Prototyping:** Describe your app (e.g., *"A Flask API with SQLAlchemy and JWT auth"*) and get a full folder structure in seconds.
 - **🧠 Intelligent Code Generation:** - **Structure Only:** Fast folder layout for planning.
