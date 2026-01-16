@@ -121,7 +121,7 @@ def main():
             st.session_state.nav_index = menu_options.index(selected)
         
         st.divider()
-        st.caption("v5.2 | Subfolder Support")
+        st.caption("v5.2 | Stable Build")
 
     # --- 1. HOME PAGE ---
     if selected == "Home":
