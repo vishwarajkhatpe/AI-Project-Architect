@@ -100,23 +100,23 @@ Download the generated project as a clean `.zip` archive, ready to run or commit
 
 Run AI Architect locally for full control or development.
 
-### 1️⃣ Clone the Repository
+### 1. **Clone the Repository**
 ```bash
 git clone https://github.com/vishwarajkhatpe/AI-Project-Architect.git
 cd AI-Project-Architect
 ```
 
-2. **Install dependencies**
+### 2. **Install dependencies**
 ```bash
     pip install -r requirements.txt
 ```
 
-3. **Set up API Key (Optional)** You can either enter your key in the app's Settings menu or create a .env file for auto-loading:
+### 3. **Set up API Key (Optional)** You can either enter your key in the app's Settings menu or create a .env file for auto-loading:
 ```bash
     # .env file
     HF_TOKEN=hf_your_huggingface_token_here
 ```
-4. **Run the App**
+### 4. **Run the App**
 ```bash
     streamlit run dashboard.py
 ```
