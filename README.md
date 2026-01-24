@@ -2,7 +2,10 @@
 
 [![Version](https://img.shields.io/badge/current%20version-v5.2-blueviolet)](https://github.com/vishwarajkhatpe/AI-Project-Architect/releases/tag/v5.2)
 [![Live App](https://img.shields.io/badge/Live%20App-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://ai-project-architect.streamlit.app)
+[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-Inference-yellow?logo=huggingface&logoColor=black)](https://huggingface.co/)
+![AI Powered](https://img.shields.io/badge/AI-Powered-purple)
 ![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
+![Architecture](https://img.shields.io/badge/Architecture-Modular-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Status](https://img.shields.io/badge/Status-Stable-success)
 
