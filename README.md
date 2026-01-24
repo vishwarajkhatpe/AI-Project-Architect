@@ -1,71 +1,125 @@
-# 🏗️ AI Architect (v5.1 Enterprise)
+# 🏗️ AI Architect — Enterprise Project Generator (v5.2)
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/)
+![Release](https://img.shields.io/badge/release-stable-success)
+[![Live App](https://img.shields.io/badge/Live%20App-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://ai-project-architect.streamlit.app)
 ![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Status](https://img.shields.io/badge/Status-Stable-success)
 
-**AI Architect** is an intelligent boilerplate generator that turns natural language descriptions into production-ready project structures. Powered by **Qwen 2.5 (32B)** and **Google Gemma 2**, it generates valid file trees, writes boilerplate code, and allows for interactive customization before export.
+**AI Architect** is an AI-powered project scaffolding platform that converts natural-language specifications into **production-ready project structures and boilerplate code**.
+
+It is designed for developers, startups, and teams who want to move from idea to codebase **quickly, consistently, and with minimal setup overhead**.
+
+The system leverages large language models such as **Qwen 2.5 (32B)** and **Google Gemma 2** to generate clean folder hierarchies, boilerplate files, and optional working code through an interactive visual workflow.
 
 ---
 
-## 🚀 What's New in v5.2?
+## 🚀 What’s New in v5.2
 
-We have completely overhauled the parsing engine and UI to handle complex, enterprise-level project structures.
+Version **5.2** introduces major architectural and usability improvements aimed at **enterprise-scale projects**.
 
-* **📂 Infinite Subfolder Support:** The new Recursive Parser can generate deeply nested trees (e.g., `src/components/ui/buttons/primary.tsx`).
-* **📜 Scrollable Tree View:** Fixed layout issues for large projects. The tree view now supports horizontal and vertical scrolling within a fixed container.
-* **🧠 Smarter AI Logic:** switched to `huggingface_hub` with One-Shot Prompting to ensure strict JSON output and prevent "lazy" code generation.
-* **✨ UI Enhancements:** Added an "Expand/Collapse All" toggle and optimized the layout to a 50/50 split for better visibility.
-## ✨ Features
+- **Infinite Nested Folder Support**  
+  A fully recursive parsing engine enables deeply nested paths  
+  (e.g. `src/components/ui/buttons/primary.tsx`).
+
+- **Scrollable Project Tree View**  
+  Large project structures are rendered inside a fixed container with horizontal and vertical scrolling.
+
+- **Improved AI Output Reliability**  
+  Migrated to `huggingface_hub` with one-shot prompting to enforce strict JSON output and prevent partial or malformed generations.
+
+- **UI & Workflow Enhancements**  
+  - Expand / Collapse All controls  
+  - Balanced 50/50 layout for navigation and preview  
+  - Improved visual hierarchy for large projects
 
 ---
 
-- **🚀 Instant Prototyping:** Describe your app (e.g., *"A Flask API with SQLAlchemy and JWT auth"*) and get a full folder structure in seconds.
-- **🧠 Intelligent Code Generation:** - **Structure Only:** Fast folder layout for planning.
-  - **Simple Code:** Class skeletons, function definitions, and TODOs.
-  - **Working Code:** Full logic, imports, error handling, and requirements.
-- **🎨 Interactive Studio:** - Visual Tree View to explore generated files.
-  - Syntax highlighting for code preview (Python, JSON, etc.).
-  - Select/Deselect specific files before downloading.
-- **📦 One-Click Export:** Download your entire project as a clean `.zip` package, ready to run.
-- **🌈 Modern UI:** A fully responsive, professional interface with "Dark Tech" gradient styling and smooth animations.
+## ✨ Key Features
+
+### 🚀 Rapid Project Scaffolding
+Describe your application in plain English, for example:
+
+> *A Flask REST API with SQLAlchemy, JWT authentication, and PostgreSQL*
+
+AI Architect generates a complete project structure in seconds.
+
+---
+
+### 🧠 Intelligent Code Generation Modes
+
+Choose the level of detail that fits your workflow:
+
+- **Structure Only** — Folder and file layout for planning
+- **Simple Code** — Class skeletons, function signatures, TODOs
+- **Working Code** — Fully wired logic, imports, error handling, and dependencies
+
+---
+
+### 🎨 Interactive Builder Studio
+
+- Visual file-tree explorer
+- Syntax-highlighted code preview (Python, JSON, etc.)
+- Select or exclude specific files before export
+
+---
+
+### 📦 One-Click Export
+
+Download the generated project as a clean `.zip` archive, ready to run or commit.
+
+---
+
+### 🌈 Modern Developer UI
+
+- Fully responsive layout
+- Dark, tech-inspired gradient theme
+- Smooth transitions and animations
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** [Streamlit](https://streamlit.io/)
-- **AI Engine:** [Hugging Face Inference API](https://huggingface.co/inference-api)
-- **Models:** - `Qwen/Qwen2.5-Coder-32B-Instruct` (High Precision)
-  - `google/gemma-2-9b-it` (High Speed)
-- **Utilities:** `streamlit-tree-select`, `streamlit-option-menu`
+**Frontend**
+- Streamlit
+
+**AI & Inference**
+- Hugging Face Inference API
+
+**Models**
+- `Qwen/Qwen2.5-Coder-32B-Instruct` — high-precision reasoning
+- `google/gemma-2-9b-it` — fast generation
+
+**Utilities**
+- `streamlit-tree-select`
+- `streamlit-option-menu`
 
 ---
 
 ## 💻 Local Installation
 
-If you prefer to run this locally instead of on the cloud:
+Run AI Architect locally for full control or development.
 
-1. **Clone the repository**
-   ```bash
-   git clone [https://github.com vishwarajkhatpe/AI-Project-Architect.git](https://github.com/vishwarajkhatpe/AI-Project-Architect.git)
-
-   cd AI-Project-Architect
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/vishwarajkhatpe/AI-Project-Architect.git
+cd AI-Project-Architect
+```
 
 2. **Install dependencies**
-    '''bash
+```bash
     pip install -r requirements.txt
+```
 
 3. **Set up API Key (Optional)** You can either enter your key in the app's Settings menu or create a .env file for auto-loading:
-    '''bash
+```bash
     # .env file
     HF_TOKEN=hf_your_huggingface_token_here
-
+```
 4. **Run the App**
-    '''bash
+```bash
     streamlit run dashboard.py
-
+```
 ---
 
 
@@ -109,11 +163,16 @@ Contributions are welcome! Please fork the repository and submit a Pull Request.
 
 1. Fork the Project
 
-2. Create your Feature Branch (git checkout -b feature/AmazingFeature)
+2. Create your Feature Branch
+```bash
+git checkout -b feature/AmazingFeature
+```
 
-3. Commit your Changes (git commit -m 'Add some AmazingFeature')
-
-4. Push to the Branch (git push origin        feature/AmazingFeature)
+3. Commit your Changes
+```bash
+   git commit -m 'Add some AmazingFeature')
+```
+4. Push to your Branch
 
 5. Open a Pull Request
 
