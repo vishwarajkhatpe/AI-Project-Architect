@@ -99,6 +99,26 @@ Download the generated project as a clean `.zip` archive, ready to run or commit
 
 ---
 
+## 🧠 System Architecture
+```text
+User Prompt
+   ↓
+Streamlit UI
+   ↓
+Prompt Builder
+   ↓
+Hugging Face Inference API
+   ↓
+LLM (Qwen / Gemma)
+   ↓
+Strict JSON Parser
+   ↓
+File Tree Generator
+   ↓
+ZIP Exporter
+```
+---
+
 ## 💻 Local Installation
 
 Run AI Architect locally for full control or development.
