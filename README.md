@@ -167,7 +167,6 @@ AI-Architect/
 
 ---
 
-
 **❓ FAQ**</br>
 
 Q: Is the generated code production-ready?</br> 
@@ -177,6 +176,13 @@ Q: Why does generation take ~45 seconds? </br>A: We use a large 32-Billion param
 
 Q: Is my data private? </br>
 A: Yes. Your prompts are processed via the Hugging Face API and are not stored by this application. If you use a custom API token, it is only stored in your browser's temporary session.
+
+---
+## ⚠️ Limitations
+
+- Generated code requires human review
+- LLM latency increases with project size
+- Business logic must be customized post-generation
 
 ---
 
