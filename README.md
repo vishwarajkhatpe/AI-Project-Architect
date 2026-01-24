@@ -1,6 +1,6 @@
 # 🏗️ AI Architect — Enterprise Project Generator (v5.2)
 
-![Version](https://img.shields.io/badge/current%20version-v5.2-blueviolet)
+[![Version](https://img.shields.io/badge/current%20version-v5.2-blueviolet)](https://github.com/vishwarajkhatpe/AI-Project-Architect/releases/tag/v5.2)
 [![Live App](https://img.shields.io/badge/Live%20App-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://ai-project-architect.streamlit.app)
 ![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
